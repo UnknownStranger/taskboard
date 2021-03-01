@@ -6,6 +6,7 @@ import testData from './test-data';
 
 interface AppState {
   data: typeof testData;
+  showAdd: boolean;
 }
 
 interface Result {
@@ -31,6 +32,7 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       data: testData,
+      showAdd: false,
     };
   }
 
@@ -109,7 +111,14 @@ class App extends React.Component<{}, AppState> {
               {this.state.data.columnOrder.map((columnId, index) => {
                 const column = this.state.data.columns[columnId];
                 const tasks = column.taskIds.map((taskId: string) => this.state.data.tasks[taskId]);
-                return <Column key={column.id} column={column} tasks={tasks} index={index} />;
+                return (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    tasks={tasks}
+                    index={index}
+                  />
+                );
               })}
               {provided.placeholder}
             </Box>
