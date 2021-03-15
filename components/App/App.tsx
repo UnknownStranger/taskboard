@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Box } from '@material-ui/core';
+import { Box, Container } from '@material-ui/core';
 import Column from './Column';
 import testData from './test-data';
 
@@ -27,6 +27,12 @@ interface Destination {
   index: number;
 }
 
+interface Column {
+  id: string;
+  title: string;
+  taskIds: [string];
+}
+
 class App extends React.Component<{}, AppState> {
   constructor(props: AppState) {
     super(props);
@@ -34,6 +40,7 @@ class App extends React.Component<{}, AppState> {
       data: testData,
       showAdd: false,
     };
+    this.addTask = this.addTask.bind(this);
   }
 
   onDragEnd = (result: Result) => {
@@ -96,6 +103,28 @@ class App extends React.Component<{}, AppState> {
     }
   };
 
+  // updating state when new tasks are added
+  addTask(
+    childState: { tasks: { id: string; task: string }[]; id: string },
+    task: { id: string },
+    column: Column,
+  ) {
+    const newTaskIds = [];
+    childState.tasks.forEach((t: { id: string; task: string }) => {
+      newTaskIds.push(t.id);
+    });
+
+    const newColumns = { ...this.state.data.columns };
+    newColumns[childState.id] = column;
+
+    const newTasks = { ...this.state.data.tasks };
+    newTasks[task.id] = task;
+
+    this.setState(() => ({
+      data: { ...this.state.data, columns: newColumns, tasks: newTasks },
+    }));
+  }
+
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
@@ -117,6 +146,7 @@ class App extends React.Component<{}, AppState> {
                     column={column}
                     tasks={tasks}
                     index={index}
+                    addTask={this.addTask}
                   />
                 );
               })}

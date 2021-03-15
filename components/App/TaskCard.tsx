@@ -25,12 +25,25 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 class TaskCard extends React.Component<Props> {
+  constructor(props: Props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e) {
+    if (e.defaultPrevented) {
+      return;
+    }
+    e.stopPropagation();
+  }
+
   render() {
     const { classes } = this.props;
     return (
       <Draggable draggableId={this.props.taskId} index={this.props.index}>
         {(provided: any) => (
           <Card
+            onClick={this.handleClick}
             className={classes.taskCard}
             {...provided.draggableProps}
             {...provided.dragHandleProps}

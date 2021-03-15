@@ -2,6 +2,7 @@
   "extends": ["tslint-config-airbnb", "tslint-react-hooks"],
   "rules": {
     "quotemark": [true, "single"],
+    "semicolon": [true, "always"],
     "import-name": false,
     "align": false,
     "react-hooks-nesting": true,
