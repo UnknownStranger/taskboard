@@ -30,11 +30,11 @@ class TaskCard extends React.Component<Props> {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(e) {
-    if (e.defaultPrevented) {
+  handleClick(event: { defaultPrevented: any; stopPropagation: () => void; }) {
+    if (event.defaultPrevented) {
       return;
     }
-    e.stopPropagation();
+    event.stopPropagation();
   }
 
   render() {

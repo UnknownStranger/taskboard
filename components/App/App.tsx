@@ -1,12 +1,12 @@
 import React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Box, Container } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import Column from './Column';
 import testData from './test-data';
+import AddColumn from './AddColumn';
 
 interface AppState {
   data: typeof testData;
-  showAdd: boolean;
 }
 
 interface Result {
@@ -38,9 +38,9 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       data: testData,
-      showAdd: false,
     };
     this.addTask = this.addTask.bind(this);
+    this.addColumn = this.addColumn.bind(this);
   }
 
   onDragEnd = (result: Result) => {
@@ -124,6 +124,17 @@ class App extends React.Component<{}, AppState> {
       data: { ...this.state.data, columns: newColumns, tasks: newTasks },
     }));
   }
+  // updating state when new column is created
+  addColumn(t: string, uid: string) {
+    const newColumn = { id: uid, title: t, taskIds: [] };
+    const newColumns = { ...this.state.data.columns };
+    newColumns[uid] = newColumn;
+
+    const newColumnOrder = [...this.state.data.columnOrder, uid];
+    this.setState(() => ({
+      data: { ...this.state.data, columnOrder: newColumnOrder, columns: newColumns },
+    }));
+  }
 
   render() {
     return (
@@ -151,6 +162,7 @@ class App extends React.Component<{}, AppState> {
                 );
               })}
               {provided.placeholder}
+              <AddColumn addColumn={this.addColumn} />
             </Box>
           )}
         </Droppable>
