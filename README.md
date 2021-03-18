@@ -1,4 +1,4 @@
-Live Demo(Alternate-UI):
+Live Demo:
 https://taskboard-pink.vercel.app/
 
 Old version, more interactive but less intuitive and mobile friendly:
