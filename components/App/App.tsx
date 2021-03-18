@@ -195,6 +195,21 @@ class App extends React.Component<{}, AppState> {
     }));
   }
 
+  componentDidMount() {
+    const json = localStorage.getItem('tasks');
+    const savedTasks = JSON.parse(json);
+    if (savedTasks) {
+      this.setState(() => ({
+        data: savedTasks,
+      }));
+    }
+  }
+
+  componentDidUpdate() {
+    const json = JSON.stringify(this.state.data);
+    localStorage.setItem('tasks', json);
+  }
+
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
