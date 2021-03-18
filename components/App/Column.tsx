@@ -11,7 +11,7 @@ const styles = () =>
       backgroundColor: 'whitesmoke',
       minWidth: 350,
       maxWidth: 350,
-      paddingBottom: 20,
+      padding: 20,
       margin: 20,
       textAlign: 'center',
       alignSelf: 'flex-start',
@@ -34,6 +34,9 @@ interface Props extends WithStyles<typeof styles> {
   tasks: Task[];
   index: number;
   addTask: Function;
+  deleteTask: Function;
+  deleteColumn: Function;
+  editTitle: Function;
 }
 
 interface ColumnState {
@@ -42,6 +45,7 @@ interface ColumnState {
   tasks: Task[];
   isClicked?: boolean;
   isHovering?: boolean;
+  isEditingTitle?: boolean;
 }
 
 class Column extends React.Component<Props, ColumnState> {
@@ -53,29 +57,49 @@ class Column extends React.Component<Props, ColumnState> {
       tasks: props.tasks,
       isClicked: false,
       isHovering: false,
+      isEditingTitle: false,
     };
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleGlobalEscape = this.handleGlobalEscape.bind(this);
     this.handleInputClick = this.handleInputClick.bind(this);
     this.handleClickAway = this.handleClickAway.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.handleTitleEditClick = this.handleTitleEditClick.bind(this);
+    this.handleClickStopPropagation = this.handleClickStopPropagation.bind(this);
   }
 
   handleKeyDown(event) {
     if (event.key === 'Enter' && event.target.value.length > 0) {
-      const newTask = { id: this.generateUID(), content: event.target.value };
-      const newTasks = [...this.state.tasks];
-      newTasks.push(newTask);
+      if (event.target.id === 'addTask') {
+        const newTask = { id: this.generateUID(), content: event.target.value };
+        const newTasks = [...this.state.tasks];
+        newTasks.push(newTask);
 
-      this.setState(() => ({ tasks: newTasks }));
+        this.setState(() => ({ tasks: newTasks }));
 
-      event.target.value = '';
+        event.target.value = '';
+        const column = this.props.column;
 
-      const column = this.props.column;
-      column.taskIds.push(newTask.id);
-      this.props.addTask(this.state, newTask, column);
+        column.taskIds.push(newTask.id);
+        this.props.addTask(this.state, newTask, column);
+      }
+      if (event.target.id === 'editTitle') {
+        this.props.editTitle(this.state.id, event.target.value);
+        this.setState(() => ({
+          title: event.target.value,
+          isEditingTitle: false,
+        }));
+      }
     } else if (event.key === 'Escape') {
       event.target.value = '';
-      this.setState(() => ({ isClicked: false }));
+      this.setState(() => ({ isClicked: false, isEditingTitle: false }));
+    }
+  }
+
+  handleGlobalEscape(event) {
+    if (event.key === 'Escape') {
+      event.target.value = '';
+      this.setState(() => ({ isClicked: false, isEditingTitle: false }));
     }
   }
 
@@ -99,12 +123,29 @@ class Column extends React.Component<Props, ColumnState> {
   handleClickAway(event) {
     this.setState(() => ({
       isClicked: false,
+      isEditingTitle: false,
     }));
   }
 
   handleDeleteClick(event) {
     event.stopPropagation();
-    console.log(`clicked delete on ${event.target}`);
+    this.props.deleteColumn(this.state.id, this.props.index);
+  }
+
+  handleTitleEditClick(event) {
+    event.stopPropagation();
+    this.setState(() => ({
+      isEditingTitle: !this.state.isEditingTitle,
+    }));
+    console.log(event.target.textContent);
+  }
+
+  handleClickStopPropagation(event) {
+    event.stopPropagation();
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleGlobalEscape);
   }
 
   render() {
@@ -136,10 +177,34 @@ class Column extends React.Component<Props, ColumnState> {
                   }))
                 }
               >
-                <Grid container item xs={10} justify='center' alignItems='center'>
-                  <Typography variant='h3' {...provided.dragHandleProps}>
-                    {this.props.column.title}
-                  </Typography>
+                <Grid
+                  container
+                  item
+                  xs={10}
+                  justify='center'
+                  alignItems='center'
+                  {...provided.dragHandleProps}
+                >
+                  {!this.state.isEditingTitle && (
+                    <Typography
+                      variant='h3'
+                      {...provided.dragHandleProps}
+                      onClick={this.handleTitleEditClick}
+                    >
+                      {this.state.title}
+                    </Typography>
+                  )}
+                  {this.state.isEditingTitle && (
+                    <TextField
+                      id='editTitle'
+                      label='Edit Title'
+                      variant='outlined'
+                      autoFocus={true}
+                      {...provided.dragHandleProps}
+                      onClick={this.handleClickStopPropagation}
+                      onKeyDown={this.handleKeyDown}
+                    />
+                  )}
                 </Grid>
                 {this.state.isHovering && (
                   <Grid
@@ -150,7 +215,7 @@ class Column extends React.Component<Props, ColumnState> {
                     alignItems='center'
                     onClick={this.handleDeleteClick}
                   >
-                    <Delete size='75%'/>
+                    <Delete size='75%' />
                   </Grid>
                 )}
               </Grid>
@@ -161,8 +226,10 @@ class Column extends React.Component<Props, ColumnState> {
                       <TaskCard
                         key={task.id}
                         taskContent={task.content}
+                        parentColumnId={this.props.column.id}
                         taskId={task.id}
                         index={index}
+                        deleteTask={this.props.deleteTask}
                       />
                     ))}
                     {provided.placeholder}
@@ -174,6 +241,7 @@ class Column extends React.Component<Props, ColumnState> {
                   id='addTask'
                   label='Add Task'
                   variant='outlined'
+                  autoFocus={true}
                   onKeyDown={this.handleKeyDown}
                 />
               )}

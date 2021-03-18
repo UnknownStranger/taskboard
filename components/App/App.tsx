@@ -41,6 +41,9 @@ class App extends React.Component<{}, AppState> {
     };
     this.addTask = this.addTask.bind(this);
     this.addColumn = this.addColumn.bind(this);
+    this.deleteColumn = this.deleteColumn.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
+    this.editTitle = this.editTitle.bind(this);
   }
 
   onDragEnd = (result: Result) => {
@@ -101,7 +104,7 @@ class App extends React.Component<{}, AppState> {
         data: newData,
       }));
     }
-  }
+  };
 
   // updating state when new tasks are added
   addTask(
@@ -136,6 +139,52 @@ class App extends React.Component<{}, AppState> {
     }));
   }
 
+  deleteTask(id: string, index: number, parentId: string) {
+    // removing task from column
+    const editedColumn = { ...this.state.data.columns[parentId] };
+    editedColumn.taskIds.splice(index, 1);
+    const editedColumns = { ...this.state.data.columns, editedColumn };
+
+    // removing task from task list object
+    const editedTasks = { ...this.state.data.tasks };
+    delete editedTasks[id];
+
+    this.setState(() => ({
+      data: { ...this.state.data, columns: editedColumns, tasks: editedTasks },
+    }));
+  }
+
+  deleteColumn(id: string, index: number) {
+    const editedColumnOrder = [...this.state.data.columnOrder];
+    editedColumnOrder.splice(index, 1);
+
+    const editedColumns = { ...this.state.data.columns };
+    const tasksToRemove = editedColumns[id].taskIds;
+    const editedTasks = { ...this.state.data.tasks };
+    tasksToRemove.forEach((task: string) => {
+      delete editedTasks[task];
+    });
+    delete editedColumns[id];
+
+    this.setState(() => ({
+      data: {
+        ...this.state.data,
+        columns: editedColumns,
+        columnOrder: editedColumnOrder,
+        tasks: editedTasks,
+      },
+    }));
+  }
+
+  editTitle(id: string, value: string) {
+    const editedColumn = { ...this.state.data.columns[id], title: value };
+    const editedColumns = { ...this.state.data.columns };
+    editedColumns[id] = editedColumn;
+    this.setState(() => ({
+      data: { ...this.state.data, columns: editedColumns },
+    }));
+  }
+
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
@@ -158,6 +207,9 @@ class App extends React.Component<{}, AppState> {
                     tasks={tasks}
                     index={index}
                     addTask={this.addTask}
+                    deleteColumn={this.deleteColumn}
+                    deleteTask={this.deleteTask}
+                    editTitle={this.editTitle}
                   />
                 );
               })}

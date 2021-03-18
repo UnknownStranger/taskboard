@@ -23,8 +23,10 @@ const styles = () =>
 
 interface Props extends WithStyles<typeof styles> {
   taskContent: string;
+  parentColumnId: string;
   taskId: string;
   index: number;
+  deleteTask: Function;
 }
 
 interface TaskCardState {
@@ -50,7 +52,7 @@ class TaskCard extends React.Component<Props, TaskCardState> {
 
   handleDeleteClick(event) {
     event.stopPropagation();
-    console.log(`clicked ${event.target}`);
+    this.props.deleteTask(this.props.taskId, this.props.index, this.props.parentColumnId);
   }
 
   render() {
