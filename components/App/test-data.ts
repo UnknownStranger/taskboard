@@ -15,7 +15,7 @@ const testData = {
     },
     'column-2': {
       id: 'column-2',
-      title: 'You get it',
+      title: 'Continued',
       taskIds: ['task-5', 'task-6'],
     },
   },

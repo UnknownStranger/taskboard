@@ -105,7 +105,7 @@ class App extends React.Component<{}, AppState> {
         data: newData,
       }));
     }
-  };
+  }
 
   // updating state when new tasks are added
   addTask(
