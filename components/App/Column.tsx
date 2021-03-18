@@ -1,8 +1,9 @@
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { Container, Box, TextField, ClickAwayListener } from '@material-ui/core';
-import TaskCard from './TaskCard';
+import { Container, Box, TextField, ClickAwayListener, Grid, Typography } from '@material-ui/core';
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles';
+import TaskCard from './TaskCard';
+import Delete from './Delete';
 
 const styles = () =>
   createStyles({
@@ -40,6 +41,7 @@ interface ColumnState {
   title: string;
   tasks: Task[];
   isClicked?: boolean;
+  isHovering?: boolean;
 }
 
 class Column extends React.Component<Props, ColumnState> {
@@ -50,10 +52,12 @@ class Column extends React.Component<Props, ColumnState> {
       title: props.column.title,
       tasks: props.tasks,
       isClicked: false,
+      isHovering: false,
     };
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleInputClick = this.handleInputClick.bind(this);
     this.handleClickAway = this.handleClickAway.bind(this);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
   }
 
   handleKeyDown(event) {
@@ -84,7 +88,7 @@ class Column extends React.Component<Props, ColumnState> {
     return `${s4() + s4() + s4()}-${date}`;
   }
 
-  handleClick(event) {
+  handleInputClick(event) {
     event.stopPropagation;
     if (event.defaultPrevented || event.target.id === 'addTask') {
       return;
@@ -98,6 +102,11 @@ class Column extends React.Component<Props, ColumnState> {
     }));
   }
 
+  handleDeleteClick(event) {
+    event.stopPropagation();
+    console.log(`clicked delete on ${event.target}`);
+  }
+
   render() {
     const { classes } = this.props;
     return (
@@ -106,12 +115,45 @@ class Column extends React.Component<Props, ColumnState> {
           <ClickAwayListener onClickAway={this.handleClickAway}>
             <Container
               id='addTaskArea'
-              onClick={this.handleClick}
+              onClick={this.handleInputClick}
               className={classes.container}
               {...provided.draggableProps}
               ref={provided.innerRef}
             >
-              <h1 {...provided.dragHandleProps}>{this.props.column.title}</h1>
+              <Grid
+                container
+                direction='row'
+                justify='center'
+                alignItems='center'
+                onMouseEnter={() =>
+                  this.setState(() => ({
+                    isHovering: true,
+                  }))
+                }
+                onMouseLeave={() =>
+                  this.setState(() => ({
+                    isHovering: false,
+                  }))
+                }
+              >
+                <Grid container item xs={10} justify='center' alignItems='center'>
+                  <Typography variant='h3' {...provided.dragHandleProps}>
+                    {this.props.column.title}
+                  </Typography>
+                </Grid>
+                {this.state.isHovering && (
+                  <Grid
+                    container
+                    item
+                    xs={2}
+                    justify='center'
+                    alignItems='center'
+                    onClick={this.handleDeleteClick}
+                  >
+                    <Delete size='75%'/>
+                  </Grid>
+                )}
+              </Grid>
               <Droppable droppableId={this.props.column.id} type='task'>
                 {(provided: any) => (
                   <Box ref={provided.innerRef} {...provided.droppableProps}>
