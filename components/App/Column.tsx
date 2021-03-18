@@ -3,7 +3,7 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Container, Box, TextField, ClickAwayListener, Grid, Typography } from '@material-ui/core';
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles';
 import TaskCard from './TaskCard';
-import Delete from './Delete';
+import Menu from './Menu';
 
 const styles = () =>
   createStyles({
@@ -15,6 +15,10 @@ const styles = () =>
       margin: 20,
       textAlign: 'center',
       alignSelf: 'flex-start',
+    },
+    input: {
+      margin: 20,
+      marginBottom: 0,
     },
   });
 
@@ -66,10 +70,9 @@ class Column extends React.Component<Props, ColumnState> {
     this.handleClickAway = this.handleClickAway.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleTitleEditClick = this.handleTitleEditClick.bind(this);
-    this.handleClickStopPropagation = this.handleClickStopPropagation.bind(this);
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: any) {
     if (event.key === 'Enter' && event.target.value.length > 0) {
       if (event.target.id === 'addTask') {
         const newTask = { id: this.generateUID(), content: event.target.value };
@@ -93,7 +96,7 @@ class Column extends React.Component<Props, ColumnState> {
     }
   }
 
-  handleGlobalEscape(event) {
+  handleGlobalEscape(event: any) {
     if (event.key === 'Escape') {
       event.target.value = '';
       this.setState(() => ({ isClicked: false, isEditingTitle: false }));
@@ -109,35 +112,28 @@ class Column extends React.Component<Props, ColumnState> {
     return `${s4() + s4() + s4()}-${date}`;
   }
 
-  handleInputClick(event) {
-    event.stopPropagation;
+  handleInputClick(event: any) {
     if (event.defaultPrevented || event.target.id === 'addTask') {
       return;
     }
     this.setState(() => ({ isClicked: !this.state.isClicked }));
   }
 
-  handleClickAway(event) {
+  handleClickAway() {
     this.setState(() => ({
       isClicked: false,
       isEditingTitle: false,
     }));
   }
 
-  handleDeleteClick(event) {
-    event.stopPropagation();
+  handleDeleteClick() {
     this.props.deleteColumn(this.state.id, this.props.index);
   }
 
-  handleTitleEditClick(event) {
-    event.stopPropagation();
+  handleTitleEditClick() {
     this.setState(() => ({
       isEditingTitle: !this.state.isEditingTitle,
     }));
-  }
-
-  handleClickStopPropagation(event) {
-    event.stopPropagation();
   }
 
   componentDidMount() {
@@ -181,43 +177,36 @@ class Column extends React.Component<Props, ColumnState> {
                   container
                   item
                   xs={10}
-                  justify='center'
+                  justify='space-between'
                   alignItems='center'
                   {...provided.dragHandleProps}
                 >
-                  {!this.state.isEditingTitle && (
-                    <Typography
-                      variant='h3'
-                      {...provided.dragHandleProps}
-                      onClick={this.handleTitleEditClick}
-                    >
-                      {this.state.title}
-                    </Typography>
-                  )}
-                  {this.state.isEditingTitle && (
-                    <TextField
-                      id='editTitle'
-                      label='Edit Title'
-                      variant='outlined'
-                      autoFocus={true}
-                      {...provided.dragHandleProps}
-                      onClick={this.handleClickStopPropagation}
-                      onKeyDown={this.handleKeyDown}
-                    />
-                  )}
-                </Grid>
-                {this.state.isHovering && (
-                  <Grid
-                    container
-                    item
-                    xs={2}
-                    justify='center'
-                    alignItems='center'
-                    onClick={this.handleDeleteClick}
-                  >
-                    <Delete size='75%' />
+                  <Grid container item xs={11} justify='center' alignItems='center'>
+                    {!this.state.isEditingTitle && (
+                      <Typography
+                        noWrap
+                        variant='h3'
+                        {...provided.dragHandleProps}
+                        onClick={this.handleTitleEditClick}
+                      >
+                        {this.state.title}
+                      </Typography>
+                    )}
+                    {this.state.isEditingTitle && (
+                      <TextField
+                        id='editTitle'
+                        label='Edit Title'
+                        variant='outlined'
+                        autoFocus={true}
+                        {...provided.dragHandleProps}
+                        onKeyDown={this.handleKeyDown}
+                      />
+                    )}
                   </Grid>
-                )}
+                  <Grid container item xs={1}>
+                    <Menu deleteClick={this.handleDeleteClick} />
+                  </Grid>
+                </Grid>
               </Grid>
               <Droppable droppableId={this.props.column.id} type='task'>
                 {(provided: any) => (
@@ -237,7 +226,7 @@ class Column extends React.Component<Props, ColumnState> {
                   </Box>
                 )}
               </Droppable>
-              {this.state.isClicked && (
+              <div className={classes.input}>
                 <TextField
                   id='addTask'
                   label='Add Task'
@@ -245,7 +234,7 @@ class Column extends React.Component<Props, ColumnState> {
                   autoFocus={true}
                   onKeyDown={this.handleKeyDown}
                 />
-              )}
+              </div>
             </Container>
           </ClickAwayListener>
         )}

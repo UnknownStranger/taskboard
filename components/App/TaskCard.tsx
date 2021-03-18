@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { Draggable } from 'react-beautiful-dnd';
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles';
-import Delete from './Delete';
+import Menu from './Menu';
 
 const styles = () =>
   createStyles({
@@ -54,11 +54,11 @@ class TaskCard extends React.Component<Props, TaskCardState> {
     this.handleEscapeEdit = this.handleEscapeEdit.bind(this);
     this.handleCardEditClick = this.handleCardEditClick.bind(this);
     this.handleClickAway = this.handleClickAway.bind(this);
-    this.handleClickStopPropagation = this.handleClickStopPropagation.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.stopClickPropagation = this.stopClickPropagation.bind(this);
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: any) {
     if (event.key === 'Enter' && event.target.value.length > 0) {
       if (event.target.id === 'editCard') {
         this.props.editTask(this.props.taskId, event.target.value);
@@ -69,31 +69,29 @@ class TaskCard extends React.Component<Props, TaskCardState> {
     }
   }
 
-  handleDeleteClick(event) {
-    event.stopPropagation();
+  handleDeleteClick() {
     this.props.deleteTask(this.props.taskId, this.props.index, this.props.parentColumnId);
   }
 
-  handleCardEditClick(event) {
-    event.stopPropagation();
+  handleCardEditClick() {
     this.setState(() => ({
       isEditingCard: !this.state.isEditingCard,
     }));
   }
 
-  handleEscapeEdit(event) {
+  handleEscapeEdit(event: any) {
     if (event.key === 'Escape') {
       this.setState(() => ({ isEditingCard: false }));
     }
   }
 
-  handleClickAway(event) {
+  handleClickAway() {
     this.setState(() => ({
       isEditingCard: false,
     }));
   }
 
-  handleClickStopPropagation(event) {
+  stopClickPropagation(event) {
     event.stopPropagation();
   }
 
@@ -129,7 +127,7 @@ class TaskCard extends React.Component<Props, TaskCardState> {
           >
             <ClickAwayListener onClickAway={this.handleClickAway}>
               <CardContent className={classes.taskCardContent}>
-                <Grid container direction='row' justify='center' alignItems='center'>
+                <Grid container direction='row' justify='space-between' alignItems='center'>
                   <Grid container item xs={10} justify='center' alignItems='center'>
                     {!this.state.isEditingCard && (
                       <Typography className={classes.title} color='textSecondary'>
@@ -142,24 +140,21 @@ class TaskCard extends React.Component<Props, TaskCardState> {
                         label='Edit Task'
                         variant='outlined'
                         autoFocus={true}
-                        onClick={this.handleClickStopPropagation}
                         onKeyDown={this.handleKeyDown}
                       />
                     )}
                   </Grid>
-                  {this.state.isHovering && (
-                    <Grid
-                      container
-                      item
-                      xs={2}
-                      justify='flex-end'
-                      alignItems='center'
-                      style={{ margin: '-18px 0px' }}
-                      onClick={this.handleDeleteClick}
-                    >
-                      <Delete size='50%' />
-                    </Grid>
-                  )}
+                  <Grid
+                    container
+                    item
+                    xs={2}
+                    justify='flex-end'
+                    alignItems='center'
+                    style={{ margin: '-18px 0px' }}
+                    onClick={this.stopClickPropagation}
+                  >
+                    <Menu deleteClick={this.handleDeleteClick}/>
+                  </Grid>
                 </Grid>
               </CardContent>
             </ClickAwayListener>
