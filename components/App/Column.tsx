@@ -48,8 +48,6 @@ interface ColumnState {
   id: string;
   title: string;
   tasks: Task[];
-  isClicked?: boolean;
-  isHovering?: boolean;
   isEditingTitle?: boolean;
 }
 
@@ -60,13 +58,10 @@ class Column extends React.Component<Props, ColumnState> {
       id: props.column.id,
       title: props.column.title,
       tasks: props.tasks,
-      isClicked: false,
-      isHovering: false,
       isEditingTitle: false,
     };
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleGlobalEscape = this.handleGlobalEscape.bind(this);
-    this.handleInputClick = this.handleInputClick.bind(this);
     this.handleClickAway = this.handleClickAway.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleTitleEditClick = this.handleTitleEditClick.bind(this);
@@ -79,7 +74,7 @@ class Column extends React.Component<Props, ColumnState> {
         const newTasks = [...this.state.tasks];
         newTasks.push(newTask);
 
-        const column = this.props.column;
+        const column = { ...this.props.column };
 
         column.taskIds.push(newTask.id);
         this.props.addTask(this.state, newTask, column);
@@ -99,7 +94,7 @@ class Column extends React.Component<Props, ColumnState> {
   handleGlobalEscape(event: any) {
     if (event.key === 'Escape') {
       event.target.value = '';
-      this.setState(() => ({ isClicked: false, isEditingTitle: false }));
+      this.setState(() => ({ isEditingTitle: false }));
     }
   }
 
@@ -112,16 +107,8 @@ class Column extends React.Component<Props, ColumnState> {
     return `${s4() + s4() + s4()}-${date}`;
   }
 
-  handleInputClick(event: any) {
-    if (event.defaultPrevented || event.target.id === 'addTask') {
-      return;
-    }
-    this.setState(() => ({ isClicked: !this.state.isClicked }));
-  }
-
   handleClickAway() {
     this.setState(() => ({
-      isClicked: false,
       isEditingTitle: false,
     }));
   }
@@ -149,30 +136,13 @@ class Column extends React.Component<Props, ColumnState> {
     return (
       <Draggable draggableId={this.props.column.id} index={this.props.index}>
         {(provided: any) => (
-          <ClickAwayListener onClickAway={this.handleClickAway}>
-            <Container
-              id='addTaskArea'
-              onClick={this.handleInputClick}
-              className={classes.container}
-              {...provided.draggableProps}
-              ref={provided.innerRef}
-            >
-              <Grid
-                container
-                direction='row'
-                justify='center'
-                alignItems='center'
-                onMouseEnter={() =>
-                  this.setState(() => ({
-                    isHovering: true,
-                  }))
-                }
-                onMouseLeave={() =>
-                  this.setState(() => ({
-                    isHovering: false,
-                  }))
-                }
-              >
+          <Container
+            className={classes.container}
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+          >
+            <Grid container direction='row' justify='center' alignItems='center'>
+              <ClickAwayListener onClickAway={this.handleClickAway}>
                 <Grid
                   container
                   item
@@ -207,36 +177,36 @@ class Column extends React.Component<Props, ColumnState> {
                     <Menu deleteClick={this.handleDeleteClick} />
                   </Grid>
                 </Grid>
-              </Grid>
-              <Droppable droppableId={this.props.column.id} type='task'>
-                {(provided: any) => (
-                  <Box ref={provided.innerRef} {...provided.droppableProps}>
-                    {this.props.tasks.map((task: Task, index: number) => (
-                      <TaskCard
-                        key={task.id}
-                        taskContent={task.content}
-                        parentColumnId={this.props.column.id}
-                        taskId={task.id}
-                        index={index}
-                        deleteTask={this.props.deleteTask}
-                        editTask={this.props.editTask}
-                      />
-                    ))}
-                    {provided.placeholder}
-                  </Box>
-                )}
-              </Droppable>
-              <div className={classes.input}>
-                <TextField
-                  id='addTask'
-                  label='Add Task'
-                  variant='outlined'
-                  autoFocus={true}
-                  onKeyDown={this.handleKeyDown}
-                />
-              </div>
-            </Container>
-          </ClickAwayListener>
+              </ClickAwayListener>
+            </Grid>
+            <Droppable droppableId={this.props.column.id} type='task'>
+              {(provided: any) => (
+                <Box ref={provided.innerRef} {...provided.droppableProps}>
+                  {this.props.tasks.map((task: Task, index: number) => (
+                    <TaskCard
+                      key={task.id}
+                      taskContent={task.content}
+                      parentColumnId={this.props.column.id}
+                      taskId={task.id}
+                      index={index}
+                      deleteTask={this.props.deleteTask}
+                      editTask={this.props.editTask}
+                    />
+                  ))}
+                  {provided.placeholder}
+                </Box>
+              )}
+            </Droppable>
+            <div className={classes.input}>
+              <TextField
+                id='addTask'
+                label='Add Task'
+                variant='outlined'
+                autoFocus={true}
+                onKeyDown={this.handleKeyDown}
+              />
+            </div>
+          </Container>
         )}
       </Draggable>
     );

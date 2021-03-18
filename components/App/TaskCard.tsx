@@ -38,7 +38,6 @@ interface Props extends WithStyles<typeof styles> {
 
 interface TaskCardState {
   taskContent: string;
-  isHovering?: boolean;
   isEditingCard?: boolean;
 }
 
@@ -47,7 +46,6 @@ class TaskCard extends React.Component<Props, TaskCardState> {
     super(props);
     this.state = {
       taskContent: this.props.taskContent,
-      isHovering: false,
       isEditingCard: false,
     };
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -113,22 +111,12 @@ class TaskCard extends React.Component<Props, TaskCardState> {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             ref={provided.innerRef}
-            onMouseEnter={() =>
-              this.setState(() => ({
-                isHovering: true,
-              }))
-            }
-            onMouseLeave={() =>
-              this.setState(() => ({
-                isHovering: false,
-              }))
-            }
             onClick={this.handleCardEditClick}
           >
             <ClickAwayListener onClickAway={this.handleClickAway}>
               <CardContent className={classes.taskCardContent}>
-                <Grid container direction='row' justify='space-between' alignItems='center'>
-                  <Grid container item xs={10} justify='center' alignItems='center'>
+                <Grid container direction='row' justify='space-between'>
+                  <Grid container xs={10} justify='center' alignItems='center'>
                     {!this.state.isEditingCard && (
                       <Typography className={classes.title} color='textSecondary'>
                         {this.props.taskContent}
@@ -146,10 +134,7 @@ class TaskCard extends React.Component<Props, TaskCardState> {
                   </Grid>
                   <Grid
                     container
-                    item
                     xs={2}
-                    justify='flex-end'
-                    alignItems='center'
                     style={{ margin: '-18px 0px' }}
                     onClick={this.stopClickPropagation}
                   >

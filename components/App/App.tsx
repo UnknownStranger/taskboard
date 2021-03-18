@@ -128,6 +128,7 @@ class App extends React.Component<{}, AppState> {
       data: { ...this.state.data, columns: newColumns, tasks: newTasks },
     }));
   }
+
   // updating state when new column is created
   addColumn(t: string, uid: string) {
     const newColumn = { id: uid, title: t, taskIds: [] };
