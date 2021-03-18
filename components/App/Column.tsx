@@ -80,6 +80,8 @@ class Column extends React.Component<Props, ColumnState> {
 
         column.taskIds.push(newTask.id);
         this.props.addTask(this.state, newTask, column);
+
+        event.target.value = '';
       }
       if (event.target.id === 'editTitle') {
         this.props.editTitle(this.state.id, event.target.value);
@@ -140,6 +142,10 @@ class Column extends React.Component<Props, ColumnState> {
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleGlobalEscape);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleGlobalEscape);
   }
 
   render() {

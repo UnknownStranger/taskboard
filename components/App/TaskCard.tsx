@@ -96,8 +96,13 @@ class TaskCard extends React.Component<Props, TaskCardState> {
   handleClickStopPropagation(event) {
     event.stopPropagation();
   }
+
   componentDidMount() {
     document.addEventListener('keydown', this.handleEscapeEdit);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleEscapeEdit);
   }
 
   render() {
