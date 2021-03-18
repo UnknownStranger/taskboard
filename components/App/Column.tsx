@@ -37,6 +37,7 @@ interface Props extends WithStyles<typeof styles> {
   deleteTask: Function;
   deleteColumn: Function;
   editTitle: Function;
+  editTask: Function;
 }
 
 interface ColumnState {
@@ -75,9 +76,6 @@ class Column extends React.Component<Props, ColumnState> {
         const newTasks = [...this.state.tasks];
         newTasks.push(newTask);
 
-        this.setState(() => ({ tasks: newTasks }));
-
-        event.target.value = '';
         const column = this.props.column;
 
         column.taskIds.push(newTask.id);
@@ -90,9 +88,6 @@ class Column extends React.Component<Props, ColumnState> {
           isEditingTitle: false,
         }));
       }
-    } else if (event.key === 'Escape') {
-      event.target.value = '';
-      this.setState(() => ({ isClicked: false, isEditingTitle: false }));
     }
   }
 
@@ -137,7 +132,6 @@ class Column extends React.Component<Props, ColumnState> {
     this.setState(() => ({
       isEditingTitle: !this.state.isEditingTitle,
     }));
-    console.log(event.target.textContent);
   }
 
   handleClickStopPropagation(event) {
@@ -230,6 +224,7 @@ class Column extends React.Component<Props, ColumnState> {
                         taskId={task.id}
                         index={index}
                         deleteTask={this.props.deleteTask}
+                        editTask={this.props.editTask}
                       />
                     ))}
                     {provided.placeholder}

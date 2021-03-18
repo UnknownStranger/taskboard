@@ -5,6 +5,7 @@ const testData = {
     'task-3': { id: 'task-3', content: 'Hover for delete icon, click to delete task or column' },
     'task-4': { id: 'task-4', content: 'Drag and drop to re-order columns or tasks' },
     'task-5': { id: 'task-5', content: 'Type a column title in the add column input on the right and press enter to create a new column' },
+    'task-6': { id: 'task-6', content: 'Click a task or title to edit, escape or click away to cancel' },
   },
   columns: {
     'column-1': {
@@ -15,7 +16,7 @@ const testData = {
     'column-2': {
       id: 'column-2',
       title: 'You get it',
-      taskIds: ['task-5'],
+      taskIds: ['task-5', 'task-6'],
     },
   },
   columnOrder: ['column-1', 'column-2'],

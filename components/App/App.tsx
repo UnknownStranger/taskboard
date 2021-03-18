@@ -44,6 +44,7 @@ class App extends React.Component<{}, AppState> {
     this.deleteColumn = this.deleteColumn.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
     this.editTitle = this.editTitle.bind(this);
+    this.editTask = this.editTask.bind(this);
   }
 
   onDragEnd = (result: Result) => {
@@ -185,6 +186,15 @@ class App extends React.Component<{}, AppState> {
     }));
   }
 
+  editTask(taskId: string, value: string) {
+    const editedTask = { ...this.state.data.tasks[taskId], content: value };
+    const editedTasks = { ...this.state.data.tasks };
+    editedTasks[taskId] = editedTask;
+    this.setState(() => ({
+      data: { ...this.state.data, tasks: editedTasks },
+    }));
+  }
+
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
@@ -210,6 +220,7 @@ class App extends React.Component<{}, AppState> {
                     deleteColumn={this.deleteColumn}
                     deleteTask={this.deleteTask}
                     editTitle={this.editTitle}
+                    editTask={this.editTask}
                   />
                 );
               })}
